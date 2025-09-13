@@ -72,6 +72,9 @@
       justify-content: center;
       align-items: center;
     }
+    .modal.show {
+      display: flex;
+    }
     .modal-inner {
       background: #1c1c1c;
       padding: 20px;
@@ -136,19 +139,35 @@
     .promo-btn:hover {
       background: #1ebe5b;
     }
+
+    /* error & retry styles */
+    .error {
+      color: #ff6b6b;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    .retry-btn {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #ff6b00;
+      color: #fff;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" aria-live="polite">
     <h1>IPhone Chat Generator</h1>
     <textarea id="messageInput" placeholder="Tulis pesanmu di sini..."></textarea>
-    <button onclick="generateImage()">Buat Gambar</button>
+    <button id="generateBtn" onclick="generateImage()">Buat Gambar</button>
     <div id="result"></div>
   </div>
 
   <!-- Modal Iklan -->
-  <div id="adModal" class="modal">
-    <div class="modal-inner">
+  <div id="adModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-inner" role="document">
       <h2>🔥 Promo Spesial 🔥</h2>
       <div class="promo-text">
         <p>😫 <b><i>Pengen beli panel buat bot atau boost sosmed, tapi takut kena SCAM?</i></b><br>
@@ -191,7 +210,7 @@
           <li><i>Garansi 30 hari (3x klaim)</i></li>
         </ul>
         <div class="btn-group">
-          <a href="https://img1.pixhost.to/images/7691/628405011_kenjaa.jpg" target="_blank" class="promo-btn">📸 Lihat Contoh Web</a>
+          <a href="https://img1.pixhost.to/images/7691/628405011_kenjaa.jpg" target="_blank" class="promo-btn" rel="noopener">📸 Lihat Contoh Web</a>
         </div>
 
         <hr>
@@ -203,18 +222,18 @@
           <li>✔ Garansi refill kalau drop</li>
         </ul>
         <div class="btn-group">
-          <a href="https://suntik-sosmed-bimxyz.vercel.app" target="_blank" class="promo-btn">🌐 Lihat Paket Sosmed</a>
+          <a href="https://suntik-sosmed-bimxyz.vercel.app" target="_blank" class="promo-btn" rel="noopener">🌐 Lihat Paket Sosmed</a>
         </div>
 
         <hr>
 
         <h3>📩 ORDER / TANYA-TANYA:</h3>
         <div class="btn-group">
-          <a href="https://t.me/SilentExcution" target="_blank" class="promo-btn">📨 Telegram</a>
-          <a href="https://chat.whatsapp.com/CrgaK7L4IHD8xBcuPX0FEa" target="_blank" class="promo-btn">💬 Grup WhatsApp</a>
-          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">📢 Channel WhatsApp</a>
-          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">✅ Testimoni</a>
-          <a href="https://chat.whatsapp.com/BuMum0qkZdkIKer75pqKUK?mode=ems_copy_t" target="_blank" class="promo-btn">🛒 Grub Marketplace Bimxyz Official</a>
+          <a href="https://t.me/SilentExcution" target="_blank" class="promo-btn" rel="noopener">📨 Telegram</a>
+          <a href="https://chat.whatsapp.com/CrgaK7L4IHD8xBcuPX0FEa" target="_blank" class="promo-btn" rel="noopener">💬 Grup WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn" rel="noopener">📢 Channel WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn" rel="noopener">✅ Testimoni</a>
+          <a href="https://chat.whatsapp.com/BuMum0qkZdkIKer75pqKUK?mode=ems_copy_t" target="_blank" class="promo-btn" rel="noopener">🛒 Grub Marketplace Bimxyz Official</a>
         </div>
 
         <hr>
@@ -226,54 +245,238 @@
       </div>
 
       <div class="countdown" id="countdown">Tunggu 10 detik...</div>
-      <button id="continueBtn" class="continue-btn">Lanjutkan</button>
+      <button id="continueBtn" class="continue-btn" aria-disabled="true">Lanjutkan</button>
     </div>
   </div>
 
   <script>
+    // ----- CONFIG -----
+    const COUNTDOWN_SECONDS = 10;
+    const MAX_TEXT_LENGTH = 700; // safety for API
+
+    // ----- ELEMENTS -----
     const modal = document.getElementById('adModal');
     const countdownEl = document.getElementById('countdown');
     const continueBtn = document.getElementById('continueBtn');
-    let countdown;
+    const generateBtn = document.getElementById('generateBtn');
+    const resultWrap = document.getElementById('result');
+    const messageInput = document.getElementById('messageInput');
 
-    function generateImage() {
-      const text = document.getElementById("messageInput").value.trim();
-      if (!text) return alert("Isi pesan dulu!");
+    // state
+    let countdownTimer = null;
+    let preloaded = false;
+    let preloadedBlobUrl = null;
+    let apiUrlForThisRun = null;
 
-      // Tampilkan modal iklan
-      modal.style.display = 'flex';
-      let timeLeft = 10;
-      countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
-      continueBtn.style.display = "none";
-
-      countdown = setInterval(() => {
-        timeLeft--;
-        countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
-        if (timeLeft <= 0) {
-          clearInterval(countdown);
-          countdownEl.style.display = "none";
-          continueBtn.style.display = "inline-block";
-        }
-      }, 1000);
-
-      continueBtn.onclick = () => {
-        modal.style.display = "none";
-        showResult(text);
-      };
+    // Helper: sanitize/truncate
+    function truncateText(s) {
+      if (!s) return s;
+      return s.length > MAX_TEXT_LENGTH ? s.slice(0, MAX_TEXT_LENGTH) + " ..." : s;
     }
 
-    function showResult(message) {
+    // Preload by creating Image element; resolves true when loaded or false if errored
+    function preloadImage(url) {
+      return new Promise((resolve) => {
+        preloaded = false;
+        preloadedBlobUrl = null;
+        try {
+          const img = new Image();
+          // try anonymous crossOrigin to maximize chance of usable image
+          img.crossOrigin = "anonymous";
+          img.onload = () => {
+            preloaded = true;
+            resolve({ success: true, url });
+          };
+          img.onerror = () => {
+            // not fatal — still resolve false, we will attempt fetch fallback later
+            resolve({ success: false });
+          };
+          img.src = url;
+        } catch (e) {
+          resolve({ success: false });
+        }
+      });
+    }
+
+    // Fallback: try fetch as blob (may fail due to CORS)
+    async function fetchAsBlob(url) {
+      try {
+        const res = await fetch(url, { mode: 'cors' });
+        if (!res.ok) throw new Error('network error');
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        preloadedBlobUrl = objUrl;
+        return { success: true, url: objUrl };
+      } catch (e) {
+        return { success: false };
+      }
+    }
+
+    // Show the modal (and lock scroll)
+    function openModal() {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close modal and restore scroll
+    function closeModal() {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      // cleanup countdown state
+      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+      countdownEl.style.display = '';
+      continueBtn.style.display = 'none';
+      continueBtn.setAttribute('aria-disabled', 'true');
+    }
+
+    // Main entry (button onclick kept to match your HTML)
+    async function generateImage() {
+      const rawText = messageInput.value.trim();
+      if (!rawText) { alert("Isi pesan dulu!"); return; }
+
+      // disable generate button to prevent double click
+      generateBtn.disabled = true;
+      generateBtn.style.opacity = '0.6';
+      resultWrap.innerHTML = `<div style="color:#999; margin-top:8px;">Memproses...</div>`;
+
+      // prepare API url (truncate + encode)
+      const message = truncateText(rawText);
       const time = new Intl.DateTimeFormat('id-ID', {
         timeZone: 'Asia/Jakarta',
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
       }).format(new Date());
-      const battery = Math.floor(Math.random() * 100) + 1;
-      const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=INDOSAT&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+      const battery = Math.floor(Math.random() * 50) + 50; // 50-99
+      const carrier = "INDOSAT";
 
-      document.getElementById("result").innerHTML = `<img src="${url}" alt="Hasil Chat">`;
+      apiUrlForThisRun = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${encodeURIComponent(battery)}&carrierName=${encodeURIComponent(carrier)}&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+
+      // preload image while modal runs
+      const preloadPromise = preloadImage(apiUrlForThisRun);
+
+      // show modal + countdown
+      openModal();
+      let timeLeft = COUNTDOWN_SECONDS;
+      countdownEl.style.display = '';
+      countdownEl.textContent = `Tunggu ${timeLeft} detik...`;
+      continueBtn.style.display = 'none';
+      continueBtn.setAttribute('aria-disabled', 'true');
+
+      // start countdown
+      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+      countdownTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          countdownEl.textContent = `Tunggu ${timeLeft} detik...`;
+        } else {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+          countdownEl.style.display = 'none';
+          continueBtn.style.display = 'inline-block';
+          continueBtn.setAttribute('aria-disabled', 'false');
+          // allow button to be clicked
+          continueBtn.onclick = async () => {
+            // close modal and show image (if not already)
+            closeModal();
+            await showResultWithFallback();
+          };
+        }
+      }, 1000);
+
+      // wait preload attempt but don't block UI (we already started it)
+      // ensure preloadPromise runs in background, no await here to keep countdown going
+      preloadPromise.then(() => {
+        // nothing to do here; showResultWithFallback will check preloaded flags
+      }).catch(() => {});
     }
+
+    // Called when modal finished & user clicks continue (or if we decide to auto show)
+    async function showResultWithFallback() {
+      const url = apiUrlForThisRun;
+      if (!url) {
+        resultWrap.innerHTML = `<div class="error">Error internal: url tidak tersedia.</div>`;
+        enableGenerate();
+        return;
+      }
+
+      // If preloaded succeeded (image loaded as <img> earlier), we can just set src
+      if (preloaded) {
+        injectImage(url);
+        enableGenerate();
+        return;
+      }
+
+      // If preloading failed, try fetch as blob (may work if CORS allows)
+      const blobAttempt = await fetchAsBlob(url);
+      if (blobAttempt.success && blobAttempt.url) {
+        injectImage(blobAttempt.url, true);
+        enableGenerate();
+        return;
+      }
+
+      // Final fallback: set <img src=url> (browser may still show image)
+      injectImage(url);
+      enableGenerate();
+    }
+
+    function injectImage(src, isObjectUrl = false) {
+      // cleanup previous preloaded object URLs to avoid leaks
+      if (preloadedBlobUrl && preloadedBlobUrl !== src) {
+        try { URL.revokeObjectURL(preloadedBlobUrl); } catch(e){}
+      }
+
+      resultWrap.innerHTML = `
+        <img id="finalImage" src="${src}" alt="Hasil Chat" style="max-width:100%;border-radius:8px;">
+      `;
+      const imgEl = document.getElementById('finalImage');
+      imgEl.onload = () => {
+        // ok
+      };
+      imgEl.onerror = () => {
+        // show a friendly error + retry
+        resultWrap.innerHTML = `
+          <div class="error">⚠️ Gagal memuat gambar dari server. Coba lagi.</div>
+          <button class="retry-btn" id="retryBtn">Coba Lagi</button>
+        `;
+        document.getElementById('retryBtn').onclick = () => {
+          // try again by re-running generate (simulate user clicking create)
+          // keep the same message, so call generateImage again
+          // But prevent infinite loops: enable button then trigger
+          enableGenerate();
+        };
+      };
+    }
+
+    function enableGenerate() {
+      generateBtn.disabled = false;
+      generateBtn.style.opacity = '';
+    }
+
+    // Ensure modal cannot be closed by Esc / clicking outside while countdown active:
+    window.addEventListener('keydown', (e) => {
+      if (modal.classList.contains('show') && continueBtn.getAttribute('aria-disabled') === 'true') {
+        if (e.key === 'Escape') e.preventDefault();
+      }
+    });
+    window.addEventListener('click', (e) => {
+      if (!modal.classList.contains('show')) return;
+      // if clicked outside modal-inner and continue button not enabled, ignore
+      const inner = document.querySelector('.modal-inner');
+      if (!inner.contains(e.target) && continueBtn.getAttribute('aria-disabled') === 'true') {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    });
+
+    // cleanup on unload: revoke blob URL
+    window.addEventListener('beforeunload', () => {
+      if (preloadedBlobUrl) {
+        try { URL.revokeObjectURL(preloadedBlobUrl); } catch(e) {}
+      }
+    });
   </script>
 </body>
-</html>
+                              </html>
