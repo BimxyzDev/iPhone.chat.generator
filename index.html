@@ -3,8 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>iPhone Chat Generator</title>
-  <meta name="description" content="Buat fake chat WhatsApp iPhone gaya iOS Yang terlihat seperti asli dan realistis " />
+  <title>iPhone Chat Generator | Fake Chat WA iOS Mirip Asli</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="Buat fake chat WhatsApp iPhone gaya iOS. Generator chat WA palsu mirip asli untuk prank, hiburan, dan konten sosmed." />
+  <meta name="keywords" content="fake chat wa, generator chat whatsapp, iPhone chat generator, fake whatsapp ios, bikin chat palsu, fake chat generator indonesia" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="iPhone Chat Generator" />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "iPhone Chat Generator",
+    "url": "https://domainlu.com",
+    "description": "Buat fake chat WhatsApp iPhone gaya iOS mirip asli, gratis dan mudah.",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "Any"
+  }
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -73,9 +92,6 @@
       justify-content: center;
       align-items: center;
     }
-    .modal.show {
-      display: flex;
-    }
     .modal-inner {
       background: #1c1c1c;
       padding: 20px;
@@ -140,35 +156,19 @@
     .promo-btn:hover {
       background: #1ebe5b;
     }
-
-    /* error & retry styles */
-    .error {
-      color: #ff6b6b;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    .retry-btn {
-      margin-top: 8px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: none;
-      background: #ff6b00;
-      color: #fff;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
-  <div class="container" aria-live="polite">
+  <div class="container">
     <h1>IPhone Chat Generator</h1>
     <textarea id="messageInput" placeholder="Tulis pesanmu di sini..."></textarea>
-    <button id="generateBtn" onclick="generateImage()">Buat Gambar</button>
+    <button onclick="generateImage()">Buat Gambar</button>
     <div id="result"></div>
   </div>
 
   <!-- Modal Iklan -->
-  <div id="adModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-inner" role="document">
+  <div id="adModal" class="modal">
+    <div class="modal-inner">
       <h2>🔥 Promo Spesial 🔥</h2>
       <div class="promo-text">
         <p>😫 <b><i>Pengen beli panel buat bot atau boost sosmed, tapi takut kena SCAM?</i></b><br>
@@ -211,7 +211,7 @@
           <li><i>Garansi 30 hari (3x klaim)</i></li>
         </ul>
         <div class="btn-group">
-          <a href="https://img1.pixhost.to/images/7691/628405011_kenjaa.jpg" target="_blank" class="promo-btn" rel="noopener">📸 Lihat Contoh Web</a>
+          <a href="https://img1.pixhost.to/images/7691/628405011_kenjaa.jpg" target="_blank" class="promo-btn">📸 Lihat Contoh Web</a>
         </div>
 
         <hr>
@@ -223,18 +223,18 @@
           <li>✔ Garansi refill kalau drop</li>
         </ul>
         <div class="btn-group">
-          <a href="https://suntik-sosmed-bimxyz.vercel.app" target="_blank" class="promo-btn" rel="noopener">🌐 Lihat Paket Sosmed</a>
+          <a href="https://suntik-sosmed-bimxyz.vercel.app" target="_blank" class="promo-btn">🌐 Lihat Paket Sosmed</a>
         </div>
 
         <hr>
 
         <h3>📩 ORDER / TANYA-TANYA:</h3>
         <div class="btn-group">
-          <a href="https://t.me/SilentExcution" target="_blank" class="promo-btn" rel="noopener">📨 Telegram</a>
-          <a href="https://chat.whatsapp.com/CrgaK7L4IHD8xBcuPX0FEa" target="_blank" class="promo-btn" rel="noopener">💬 Grup WhatsApp</a>
-          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn" rel="noopener">📢 Channel WhatsApp</a>
-          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn" rel="noopener">✅ Testimoni</a>
-          <a href="https://chat.whatsapp.com/BuMum0qkZdkIKer75pqKUK?mode=ems_copy_t" target="_blank" class="promo-btn" rel="noopener">🛒 Grub Marketplace Bimxyz Official</a>
+          <a href="https://t.me/SilentExcution" target="_blank" class="promo-btn">📨 Telegram</a>
+          <a href="https://chat.whatsapp.com/CrgaK7L4IHD8xBcuPX0FEa" target="_blank" class="promo-btn">💬 Grup WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">📢 Channel WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">✅ Testimoni</a>
+          <a href="https://chat.whatsapp.com/BuMum0qkZdkIKer75pqKUK?mode=ems_copy_t" target="_blank" class="promo-btn">🛒 Grub Marketplace Bimxyz Official</a>
         </div>
 
         <hr>
@@ -246,150 +246,55 @@
       </div>
 
       <div class="countdown" id="countdown">Tunggu 10 detik...</div>
-      <button id="continueBtn" class="continue-btn" aria-disabled="true">Lanjutkan</button>
+      <button id="continueBtn" class="continue-btn">Lanjutkan</button>
     </div>
   </div>
 
   <script>
-    // ----- CONFIG -----
-    const COUNTDOWN_SECONDS = 10;
-    const MAX_TEXT_LENGTH = 700; // safety for API
-
-    // ----- ELEMENTS -----
     const modal = document.getElementById('adModal');
     const countdownEl = document.getElementById('countdown');
     const continueBtn = document.getElementById('continueBtn');
-    const generateBtn = document.getElementById('generateBtn');
-    const resultWrap = document.getElementById('result');
-    const messageInput = document.getElementById('messageInput');
+    let countdown;
 
-    // state
-    let countdownTimer = null;
-    let preloaded = false;
-    let preloadedBlobUrl = null;
-    let apiUrlForThisRun = null;
+    function generateImage() {
+      const text = document.getElementById("messageInput").value.trim();
+      if (!text) return alert("Isi pesan dulu!");
 
-    // Helper: sanitize/truncate
-    function truncateText(s) {
-      if (!s) return s;
-      return s.length > MAX_TEXT_LENGTH ? s.slice(0, MAX_TEXT_LENGTH) + " ..." : s;
-    }
-
-    // Preload by creating Image element; resolves true when loaded or false if errored
-    function preloadImage(url) {
-      return new Promise((resolve) => {
-        preloaded = false;
-        preloadedBlobUrl = null;
-        try {
-          const img = new Image();
-          // try anonymous crossOrigin to maximize chance of usable image
-          img.crossOrigin = "anonymous";
-          img.onload = () => {
-            preloaded = true;
-            resolve({ success: true, url });
-          };
-          img.onerror = () => {
-            // not fatal — still resolve false, we will attempt fetch fallback later
-            resolve({ success: false });
-          };
-          img.src = url;
-        } catch (e) {
-          resolve({ success: false });
-        }
-      });
-    }
-
-    // Fallback: try fetch as blob (may fail due to CORS)
-    async function fetchAsBlob(url) {
-      try {
-        const res = await fetch(url, { mode: 'cors' });
-        if (!res.ok) throw new Error('network error');
-        const blob = await res.blob();
-        const objUrl = URL.createObjectURL(blob);
-        preloadedBlobUrl = objUrl;
-        return { success: true, url: objUrl };
-      } catch (e) {
-        return { success: false };
-      }
-    }
-
-    // Show the modal (and lock scroll)
-    function openModal() {
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    // Close modal and restore scroll
-    function closeModal() {
-      modal.classList.remove('show');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      // cleanup countdown state
-      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-      countdownEl.style.display = '';
-      continueBtn.style.display = 'none';
-      continueBtn.setAttribute('aria-disabled', 'true');
-    }
-
-    // Main entry (button onclick kept to match your HTML)
-    async function generateImage() {
-      const rawText = messageInput.value.trim();
-      if (!rawText) { alert("Isi pesan dulu!"); return; }
-
-      // disable generate button to prevent double click
-      generateBtn.disabled = true;
-      generateBtn.style.opacity = '0.6';
-      resultWrap.innerHTML = `<div style="color:#999; margin-top:8px;">Memproses...</div>`;
-
-      // prepare API url (truncate + encode)
-      const message = truncateText(rawText);
-      const time = new Intl.DateTimeFormat('id-ID', {
-<script>
-  const modal = document.getElementById('adModal');
-  const countdownEl = document.getElementById('countdown');
-  const continueBtn = document.getElementById('continueBtn');
-  let countdown;
-
-  function generateImage() {
-    const text = document.getElementById("messageInput").value.trim();
-    if (!text) return alert("Isi pesan dulu!");
-
-    // Tampilkan modal iklan
-    modal.style.display = 'flex';
-    let timeLeft = 10;
-    countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
-    countdownEl.style.display = "block";
-    continueBtn.style.display = "none";
-
-    countdown = setInterval(() => {
-      timeLeft--;
+      // Tampilkan modal iklan
+      modal.style.display = 'flex';
+      let timeLeft = 10;
       countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
-      if (timeLeft <= 0) {
-        clearInterval(countdown);
-        countdownEl.style.display = "none";
-        continueBtn.style.display = "inline-block";
-      }
-    }, 1000);
+      countdownEl.style.display = "block";
+      continueBtn.style.display = "none";
 
-    continueBtn.onclick = () => {
-      modal.style.display = "none";
-      showResult(text);
-    };
-  }
+      countdown = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          countdownEl.style.display = "none";
+          continueBtn.style.display = "inline-block";
+        }
+      }, 1000);
 
-  function showResult(message) {
-    const time = new Intl.DateTimeFormat('id-ID', {
-      timeZone: 'Asia/Jakarta',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).format(new Date());
-    const battery = Math.floor(Math.random() * 100) + 1;
-    const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=INDOSAT&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+      continueBtn.onclick = () => {
+        modal.style.display = "none";
+        showResult(text);
+      };
+    }
 
-    document.getElementById("result").innerHTML = `<img src="${url}" alt="Hasil Chat">`;
-  }
-</script>
+    function showResult(message) {
+      const time = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(new Date());
+      const battery = Math.floor(Math.random() * 100) + 1;
+      const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=INDOSAT&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+
+      document.getElementById("result").innerHTML = `<img src="${url}" alt="Hasil Chat">`;
+    }
+  </script>
 </body>
-                              </html>
+  </html>
