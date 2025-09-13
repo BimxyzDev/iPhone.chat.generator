@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPhone Chat Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background: #161b22;
+      padding: 20px;
+      border-radius: 12px;
+      width: 95%;
+      max-width: 450px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    h1 {
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: #25D366;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      resize: none;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #25D366;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1ebe5b;
+    }
+    #result {
+      margin-top: 15px;
+    }
+    #result img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-inner {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      color: #fff;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .countdown {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    .continue-btn {
+      margin-top: 15px;
+      display: none;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #25D366;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Promo Styling */
+    .promo-text {
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .promo-text h3 {
+      margin: 10px 0 5px;
+      color: #25D366;
+    }
+    .promo-text b { color: #ffcc00; }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .promo-btn {
+      display: block;
+      text-align: center;
+      background: #25D366;
+      color: white !important;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .promo-btn:hover {
+      background: #1ebe5b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>IPhone Chat Generator</h1>
+    <textarea id="messageInput" placeholder="Tulis pesanmu di sini..."></textarea>
+    <button onclick="generateImage()">Buat Gambar</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- Modal Iklan -->
+  <div id="adModal" class="modal">
+    <div class="modal-inner">
+      <h2>🔥 Promo Spesial 🔥</h2>
+      <div class="promo-text">
+        <p>😫 <b><i>Pengen beli panel buat bot atau boost sosmed, tapi takut kena SCAM?</i></b><br>
+        Tenang aja, di sini semuanya <b>aman, permanen, dan bergaransi!</b><br>
+        Gak perlu ribet, gak perlu modal besar, dan pastinya <b>harga paling ramah kantong</b>. </p>
+
+        <hr>
+
+        <h3>💻 PANEL UNTUK BOT</h3>
+        <ul>
+          <li>✔ Stabil, permanen <i>(kecuali UNLI promo)</i></li>
+          <li>✔ Gratis panduan sampai bot jalan</li>
+          <li>✔ Cocok untuk semua kebutuhan</li>
+        </ul>
+
+        <p><b>Harga Panel:</b><br>
+        • 8GB — <b>1.000</b><br>
+        • 9GB — <b>2.000</b><br>
+        • 10GB — <b>3.000</b><br>
+        • <b>UNLIMITED — 4.000 (PROMO🔥)</b></p>
+
+        <hr>
+
+        <h3>💎 RESELLER PANEL PRIVAT</h3>
+        <p>Modal cuma <b>5.000 (PROMO)</b>, dapat akun reseller:</p>
+        <ul>
+          <li>Bisa bikin panel sepuasnya</li>
+          <li>Bisa jual panel ke orang lain</li>
+          <li><b>Permanen, anti PT PT</b> jika vps mokad</li>
+          <li><u>CREATE PANEL VIA WEBSITE</u></li>
+        </ul>
+
+        <hr>
+
+        <h3>🔥 JASA PEMBUATAN WEBSITE PAYMENT</h3>
+        <p>Mau bisnis sendiri? Bikin website payment profesional cuma <b>5.000 / 5K PROMO!</b></p>
+        <ul>
+          <li>Bebas request domain, QRIS, dan kontak</li>
+          <li>Website responsive, siap pakai</li>
+          <li><i>Garansi 30 hari (3x klaim)</i></li>
+        </ul>
+        <div class="btn-group">
+          <a href="https://img1.pixhost.to/images/7691/628405011_kenjaa.jpg" target="_blank" class="promo-btn">📸 Lihat Contoh Web</a>
+        </div>
+
+        <hr>
+
+        <h3>📈 BOOST SOSIAL MEDIA</h3>
+        <p>Followers, likes, atau views sepi? Naikin dengan harga ramah kantong:</p>
+        <ul>
+          <li>✔ 100% real & masuk cepat</li>
+          <li>✔ Garansi refill kalau drop</li>
+        </ul>
+        <div class="btn-group">
+          <a href="https://suntik-sosmed-bimxyz.vercel.app" target="_blank" class="promo-btn">🌐 Lihat Paket Sosmed</a>
+        </div>
+
+        <hr>
+
+        <h3>📩 ORDER / TANYA-TANYA:</h3>
+        <div class="btn-group">
+          <a href="https://t.me/SilentExcution" target="_blank" class="promo-btn">📨 Telegram</a>
+          <a href="https://chat.whatsapp.com/CrgaK7L4IHD8xBcuPX0FEa" target="_blank" class="promo-btn">💬 Grup WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">📢 Channel WhatsApp</a>
+          <a href="https://whatsapp.com/channel/0029Vb6w2Vf65yDE1ww29e0X" target="_blank" class="promo-btn">✅ Testimoni</a>
+          <a href="https://chat.whatsapp.com/BuMum0qkZdkIKer75pqKUK?mode=ems_copy_t" target="_blank" class="promo-btn">🛒 Grub Marketplace Bimxyz Official</a>
+        </div>
+
+        <hr>
+
+        <p>⚠ <b>CATATAN PENTING:</b><br>
+        - Semua transaksi permanen, <u>no refund</u><br>
+        - Panel anti delete & anti rusuh<br>
+        - Hubungi lewat grup / Telegram, bukan chat pribadi</p>
+      </div>
+
+      <div class="countdown" id="countdown">Tunggu 10 detik...</div>
+      <button id="continueBtn" class="continue-btn">Lanjutkan</button>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('adModal');
+    const countdownEl = document.getElementById('countdown');
+    const continueBtn = document.getElementById('continueBtn');
+    let countdown;
+
+    function generateImage() {
+      const text = document.getElementById("messageInput").value.trim();
+      if (!text) return alert("Isi pesan dulu!");
+
+      // Tampilkan modal iklan
+      modal.style.display = 'flex';
+      let timeLeft = 10;
+      countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
+      continueBtn.style.display = "none";
+
+      countdown = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          countdownEl.style.display = "none";
+          continueBtn.style.display = "inline-block";
+        }
+      }, 1000);
+
+      continueBtn.onclick = () => {
+        modal.style.display = "none";
+        showResult(text);
+      };
+    }
+
+    function showResult(message) {
+      const time = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(new Date());
+      const battery = Math.floor(Math.random() * 100) + 1;
+      const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=INDOSAT&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+
+      document.getElementById("result").innerHTML = `<img src="${url}" alt="Hasil Chat">`;
+    }
+  </script>
+</body>
+</html>
