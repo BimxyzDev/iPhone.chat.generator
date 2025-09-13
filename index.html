@@ -345,139 +345,51 @@
       // prepare API url (truncate + encode)
       const message = truncateText(rawText);
       const time = new Intl.DateTimeFormat('id-ID', {
-        timeZone: 'Asia/Jakarta',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).format(new Date());
-      const battery = Math.floor(Math.random() * 50) + 50; // 50-99
-      const carrier = "INDOSAT";
+<script>
+  const modal = document.getElementById('adModal');
+  const countdownEl = document.getElementById('countdown');
+  const continueBtn = document.getElementById('continueBtn');
+  let countdown;
 
-      apiUrlForThisRun = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${encodeURIComponent(battery)}&carrierName=${encodeURIComponent(carrier)}&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+  function generateImage() {
+    const text = document.getElementById("messageInput").value.trim();
+    if (!text) return alert("Isi pesan dulu!");
 
-      // preload image while modal runs
-      const preloadPromise = preloadImage(apiUrlForThisRun);
+    // Tampilkan modal iklan
+    modal.style.display = 'flex';
+    let timeLeft = 10;
+    countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
+    countdownEl.style.display = "block";
+    continueBtn.style.display = "none";
 
-      // show modal + countdown
-      openModal();
-      let timeLeft = COUNTDOWN_SECONDS;
-      countdownEl.style.display = '';
-      countdownEl.textContent = `Tunggu ${timeLeft} detik...`;
-      continueBtn.style.display = 'none';
-      continueBtn.setAttribute('aria-disabled', 'true');
-
-      // start countdown
-      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-      countdownTimer = setInterval(() => {
-        timeLeft--;
-        if (timeLeft > 0) {
-          countdownEl.textContent = `Tunggu ${timeLeft} detik...`;
-        } else {
-          clearInterval(countdownTimer);
-          countdownTimer = null;
-          countdownEl.style.display = 'none';
-          continueBtn.style.display = 'inline-block';
-          continueBtn.setAttribute('aria-disabled', 'false');
-          // allow button to be clicked
-          continueBtn.onclick = async () => {
-            // close modal and show image (if not already)
-            closeModal();
-            await showResultWithFallback();
-          };
-        }
-      }, 1000);
-
-      // wait preload attempt but don't block UI (we already started it)
-      // ensure preloadPromise runs in background, no await here to keep countdown going
-      preloadPromise.then(() => {
-        // nothing to do here; showResultWithFallback will check preloaded flags
-      }).catch(() => {});
-    }
-
-    // Called when modal finished & user clicks continue (or if we decide to auto show)
-    async function showResultWithFallback() {
-      const url = apiUrlForThisRun;
-      if (!url) {
-        resultWrap.innerHTML = `<div class="error">Error internal: url tidak tersedia.</div>`;
-        enableGenerate();
-        return;
+    countdown = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = "Tunggu " + timeLeft + " detik...";
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        countdownEl.style.display = "none";
+        continueBtn.style.display = "inline-block";
       }
+    }, 1000);
 
-      // If preloaded succeeded (image loaded as <img> earlier), we can just set src
-      if (preloaded) {
-        injectImage(url);
-        enableGenerate();
-        return;
-      }
+    continueBtn.onclick = () => {
+      modal.style.display = "none";
+      showResult(text);
+    };
+  }
 
-      // If preloading failed, try fetch as blob (may work if CORS allows)
-      const blobAttempt = await fetchAsBlob(url);
-      if (blobAttempt.success && blobAttempt.url) {
-        injectImage(blobAttempt.url, true);
-        enableGenerate();
-        return;
-      }
+  function showResult(message) {
+    const time = new Intl.DateTimeFormat('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(new Date());
+    const battery = Math.floor(Math.random() * 100) + 1;
+    const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=INDOSAT&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
 
-      // Final fallback: set <img src=url> (browser may still show image)
-      injectImage(url);
-      enableGenerate();
-    }
-
-    function injectImage(src, isObjectUrl = false) {
-      // cleanup previous preloaded object URLs to avoid leaks
-      if (preloadedBlobUrl && preloadedBlobUrl !== src) {
-        try { URL.revokeObjectURL(preloadedBlobUrl); } catch(e){}
-      }
-
-      resultWrap.innerHTML = `
-        <img id="finalImage" src="${src}" alt="Hasil Chat" style="max-width:100%;border-radius:8px;">
-      `;
-      const imgEl = document.getElementById('finalImage');
-      imgEl.onload = () => {
-        // ok
-      };
-      imgEl.onerror = () => {
-        // show a friendly error + retry
-        resultWrap.innerHTML = `
-          <div class="error">⚠️ Gagal memuat gambar dari server. Coba lagi.</div>
-          <button class="retry-btn" id="retryBtn">Coba Lagi</button>
-        `;
-        document.getElementById('retryBtn').onclick = () => {
-          // try again by re-running generate (simulate user clicking create)
-          // keep the same message, so call generateImage again
-          // But prevent infinite loops: enable button then trigger
-          enableGenerate();
-        };
-      };
-    }
-
-    function enableGenerate() {
-      generateBtn.disabled = false;
-      generateBtn.style.opacity = '';
-    }
-
-    // Ensure modal cannot be closed by Esc / clicking outside while countdown active:
-    window.addEventListener('keydown', (e) => {
-      if (modal.classList.contains('show') && continueBtn.getAttribute('aria-disabled') === 'true') {
-        if (e.key === 'Escape') e.preventDefault();
-      }
-    });
-    window.addEventListener('click', (e) => {
-      if (!modal.classList.contains('show')) return;
-      // if clicked outside modal-inner and continue button not enabled, ignore
-      const inner = document.querySelector('.modal-inner');
-      if (!inner.contains(e.target) && continueBtn.getAttribute('aria-disabled') === 'true') {
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    });
-
-    // cleanup on unload: revoke blob URL
-    window.addEventListener('beforeunload', () => {
-      if (preloadedBlobUrl) {
-        try { URL.revokeObjectURL(preloadedBlobUrl); } catch(e) {}
-      }
-    });
-  </script>
+    document.getElementById("result").innerHTML = `<img src="${url}" alt="Hasil Chat">`;
+  }
+</script>
 </body>
                               </html>
